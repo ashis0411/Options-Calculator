@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Option Premium Calculator</title>
+<style>
+:root{color-scheme:light dark;--bg:#f6f8fb;--card:#fff;--text:#172033;--muted:#5b6577;--line:#dde3ec;--accent:#2563eb;--green:#15803d;--red:#b91c1c}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:860px;margin:0 auto;padding:28px 18px 48px}
+h1{font-size:26px;margin:0 0 6px}p.lead{color:var(--muted);margin:0 0 24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 8px 24px rgba(23,32,51,.06)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font-size:15px;background:#fff;color:var(--text)}
+input:focus,select:focus{outline:2px solid rgba(37,99,235,.25);border-color:var(--accent)}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:20px}
+.result{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fbfdff}
+.result h3{margin:0 0 6px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.result .value{font-size:26px;font-weight:750}
+.note{margin-top:16px;font-size:13px;color:var(--muted)}
+.bad{color:var(--red)}.good{color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Option Premium Calculator</h1>
+<p class="lead">Enter the market price, strike, option type, and premium. Intrinsic and extrinsic values are calculated automatically.</p>
+<div class="card">
+<div class="grid">
+<div><label for="cmp">Current Market Price</label><input id="cmp" type="number" step="any" placeholder="e.g. 23400"></div>
+<div><label for="strike">Strike</label><input id="strike" type="number" step="any" placeholder="e.g. 23300"></div>
+<div><label for="type">CE / PE</label><select id="type"><option value="">Select</option><option value="CE">CE</option><option value="PE">PE</option></select></div>
+<div><label for="premium">Premium</label><input id="premium" type="number" step="any" placeholder="e.g. 180"></div>
+</div>
+<div class="results">
+<div class="result"><h3>Intrinsic Value</h3><div class="value" id="iv">—</div></div>
+<div class="result"><h3>Extrinsic Value</h3><div class="value" id="ev">—</div></div>
+</div>
+<div class="note" id="status">Enter all four inputs to calculate.</div>
+</div>
+</div>
+<script>
+const cmp=document.getElementById('cmp'),strike=document.getElementById('strike'),type=document.getElementById('type'),premium=document.getElementById('premium'),iv=document.getElementById('iv'),ev=document.getElementById('ev'),status=document.getElementById('status');
+function calc(){const a=parseFloat(cmp.value),b=parseFloat(strike.value),t=type.value,p=parseFloat(premium.value);
+if([a,b,p].some(x=>Number.isNaN(x))||!t){iv.textContent='—';ev.textContent='—';status.textContent='Enter all four inputs to calculate.';return}
+let intrinsic=t==='CE'?Math.max(0,a-b):Math.max(0,b-a);let extrinsic=Math.max(0,p-intrinsic);
+iv.textContent=intrinsic.toFixed(2);ev.textContent=extrinsic.toFixed(2);
+status.textContent=t==='CE'?'Call option: Intrinsic value = Market Price − Strike (minimum 0).':'Put option: Intrinsic value = Strike − Market Price (minimum 0).';
+status.className='note '+(intrinsic>0?'good':'bad')}
+[cmp,strike,type,premium].forEach(el=>el.addEventListener('input',calc));
+</script>
+</body>
+</html>
